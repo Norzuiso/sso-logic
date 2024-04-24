@@ -8,11 +8,11 @@ import java.util.Random;
 @Component
 public class Utils {
 
-       public static final int MIN_PROCESS_TIME = 5;
-    //   public static final int MAX_PROCESS_TIME = 19;
+    public static final int MIN_PROCESS_TIME = 5;
+    public static final int MAX_PROCESS_TIME = 19;
 
     //public static final int MIN_PROCESS_TIME = 1;
-    public static final int MAX_PROCESS_TIME = 5;
+    //public static final int MAX_PROCESS_TIME = 5;
 
     public String getResult(String operacion) {
         String result;
@@ -31,7 +31,7 @@ public class Utils {
                 case "-" -> String.valueOf(num1 - num2);
                 case "*" -> String.valueOf(num1 * num2);
                 case "/" -> {
-                    float div = (float) num1/num2;
+                    float div = (float) num1 / num2;
                     yield String.valueOf(div);
                 }
                 case "%" -> String.valueOf(num1 % num2);

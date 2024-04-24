@@ -7,6 +7,7 @@ import com.act6logic.obj.Proceso;
 import com.act6logic.obj.ProcesosBloqueados;
 import com.act6logic.obj.ProcessResult;
 import com.act6logic.obj.ProcessTime;
+import com.act6logic.processLogic.GenerateProcessComponent;
 import com.act6logic.utils.ProcessTimeUtils;
 import com.act6logic.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import java.util.Objects;
 
 @Component
 public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityComponent {
+
+    @Autowired
+    private GenerateProcessComponent generateProcessComponent;
 
     @Autowired
     private TimeUtils timeUtils;
@@ -33,11 +37,14 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
     @Autowired
     private ProcessTimeUtils procesoTimeUtils;
 
-    private String privousState = "C";
+    private String previousState = "C";
 
 
     @Override
     public ProcessResult resolveProcess(ProcessResult pr) {
+        if (pr.getState().isEmpty()|| pr.getState().equals("undefined")){
+            pr.setState("C");
+        }
         if (pr.getProcesosEspera().isEmpty()
                 && pr.getProcesosBloqueados().getProcesosBloqueados().isEmpty()
                 && pr.getProcesoEnEjecucion().getId().isEmpty()) {
@@ -48,16 +55,19 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         ) && pr.getProcesosBloqueados().getProcesosBloqueados().isEmpty()) {
             return pr;
         }
-        if (Objects.equals(pr.getState(), "P")) {
-            privousState = "P";
+        boolean isStatePorB = Objects.equals(pr.getState(), "P") || Objects.equals(pr.getState(), "B");
+        if (isStatePorB) {
+            previousState = pr.getState();
             return pr;
         }
-        if (privousState.equals("P") && !Objects.equals(pr.getState(), "C")) {
-
-            return pr;
-        } else if (privousState.equals("P") && pr.getState().equals("C")) {
-            privousState = "C";
+        boolean isPreviousStatePorB = previousState.equals("P") || previousState.equals("B");
+        boolean isPrState = pr.getState().equals("C");
+        if (isPreviousStatePorB && isPrState) {
+            previousState = "C";
             pr.setState("C");
+        } else if (!isPrState) {
+            pr.setState(previousState);
+            return pr;
         }
 
 
@@ -84,12 +94,17 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         //Proceso terminado
         List<Proceso> procesoTerminado = pr.getProcesoTerminado();
 
+        if (pr.getState().equals("N")){
+            state = "C";
+            String lastId = procesosNuevos.getLast().getId();
+            Proceso newProceso = generateProcessComponent.generateProceso(lastId);
+            procesosNuevos.addLast(newProceso);
+        }
         if (Objects.equals(pr.getState(), "E")) {
             state = "C";
             procesosBloqueadosList.addLast(procesoEnEjecucion);
             procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
         }
-
         if (Objects.equals(pr.getState(), "W")) {
             state = "C";
             procesoEjecucionService.finisProcessError(procesoEnEjecucion, tiempoActual, "Error");

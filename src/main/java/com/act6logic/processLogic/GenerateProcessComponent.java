@@ -9,4 +9,5 @@ public interface GenerateProcessComponent {
     public List<Proceso> generateProcesos(int procesosQuantity);
 
 
+    Proceso generateProceso(String lastId);
 }

@@ -21,18 +21,27 @@ public class GenerateProcessComponentImpl implements GenerateProcessComponent {
     @Override
     public List<Proceso> generateProcesos(int procesosQuantity) {
         List<Proceso> procesos = new ArrayList<>();
-        Proceso pro = new Proceso();
         for (int i = 0; i <= procesosQuantity; i++) {
-            pro.setId("pro-" + i);
-            pro.setOperation(utils.generateOperation());
-            pro.setResult(utils.getResult(pro.getOperation()));
-            pro.setTiempoMaxEstimado(utils.generateEstimatedTime());
-            pro.setTiempoRestantePorEjecutar(timeUtils.resTime(pro.getTiempoMaxEstimado(), pro.getTiempoServicio()));
-
-            procesos.add(pro);
-            pro = new Proceso();
+            procesos.add(generateProcess(i));
         }
         return procesos;
+    }
+
+    @Override
+    public Proceso generateProceso(String lastId) {
+        String[] split = lastId.split("-");
+        int lastValue = Integer.parseInt(split[1])+1;
+        return generateProcess(lastValue);
+    }
+
+    private Proceso generateProcess(int lastValue) {
+        Proceso pro = new Proceso();
+        pro.setId("pro-" + lastValue);
+        pro.setOperation(utils.generateOperation());
+        pro.setResult(utils.getResult(pro.getOperation()));
+        pro.setTiempoMaxEstimado(utils.generateEstimatedTime());
+        pro.setTiempoRestantePorEjecutar(timeUtils.resTime(pro.getTiempoMaxEstimado(), pro.getTiempoServicio()));
+        return pro;
     }
 
 }
