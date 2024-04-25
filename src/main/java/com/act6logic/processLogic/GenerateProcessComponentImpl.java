@@ -22,7 +22,7 @@ public class GenerateProcessComponentImpl implements GenerateProcessComponent {
     public List<Proceso> generateProcesos(int procesosQuantity) {
         List<Proceso> procesos = new ArrayList<>();
         for (int i = 0; i <= procesosQuantity; i++) {
-            procesos.add(generateProcess(i));
+            procesos.add(generateProceso(i));
         }
         return procesos;
     }
@@ -31,10 +31,11 @@ public class GenerateProcessComponentImpl implements GenerateProcessComponent {
     public Proceso generateProceso(String lastId) {
         String[] split = lastId.split("-");
         int lastValue = Integer.parseInt(split[1])+1;
-        return generateProcess(lastValue);
+        return generateProceso(lastValue);
     }
 
-    private Proceso generateProcess(int lastValue) {
+    @Override
+    public Proceso generateProceso(int lastValue) {
         Proceso pro = new Proceso();
         pro.setId("pro-" + lastValue);
         pro.setOperation(utils.generateOperation());

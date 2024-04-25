@@ -10,6 +10,7 @@ import com.act6logic.obj.ProcessTime;
 import com.act6logic.processLogic.GenerateProcessComponent;
 import com.act6logic.utils.ProcessTimeUtils;
 import com.act6logic.utils.TimeUtils;
+import com.act6logic.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
     @Autowired
     private GenerateProcessComponent generateProcessComponent;
+
+    @Autowired
+    private Utils utils;
 
     @Autowired
     private TimeUtils timeUtils;
@@ -131,9 +135,22 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 }
                 state = "C";
                 previousState = "C";
-                String lastId = procesosNuevos.getLast().getId();
-                Proceso newProceso = generateProcessComponent.generateProceso(lastId);
+                new Proceso();
+                Proceso newProceso;
+                if (procesosNuevos.isEmpty()) {
+                    Integer randomInteger = utils.getRandomInteger(procesoTerminado.size(), 10000);
+                    newProceso = generateProcessComponent.generateProceso(randomInteger);
+                } else {
+                    String lastId = procesosNuevos.getLast().getId();
+                    newProceso = generateProcessComponent.generateProceso(lastId);
+                }
                 procesosNuevos.addLast(newProceso);
+                if (procesosEspera.isEmpty()) {
+                    if (processInMemory==0){
+                        processInMemory++;
+                    }
+                    processInMemory = fillProcessEspera(processInMemory, procesosNuevos, tiempoActual, procesosEspera);
+                }
                 break;
             default:
                 if (previousState.equals("P") || previousState.equals("B")) {
@@ -177,15 +194,21 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         if (procesosNuevos.isEmpty()) {
             return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera, procesosBloqueados, procesoEnEjecucion, procesoTerminado);
         }
+        processInMemory = fillProcessEspera(processInMemory, procesosNuevos, tiempoActual, procesosEspera);
+
+
+        return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera,
+                procesosBloqueados, procesoEnEjecucion, procesoTerminado);
+    }
+
+    private Integer fillProcessEspera(Integer processInMemory, List<Proceso> procesosNuevos, ProcessTime tiempoActual, List<Proceso> procesosEspera) {
         if ((processInMemory < 4) && !procesosNuevos.isEmpty()) {
             Proceso proceso = procesosNuevos.removeFirst();
             procesoTimeUtils.calculateTiemposLlegada(proceso, tiempoActual);
             procesosEspera.add(proceso);
             processInMemory++;
         }
-
-
-        return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera, procesosBloqueados, procesoEnEjecucion, procesoTerminado);
+        return processInMemory;
     }
 
     private Proceso getProcesoNewProcesoEjecucion(List<Proceso> procesosEspera, ProcessTime tiempoActual) {

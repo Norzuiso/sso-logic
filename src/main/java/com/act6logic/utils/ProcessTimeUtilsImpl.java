@@ -62,7 +62,7 @@ public class ProcessTimeUtilsImpl implements ProcessTimeUtils {
 
     /**
      * @param tiempoActual
-     * @param tiempoLlegada tiempoActual - tiempoRespuesta = tiempoRespuesta
+     * @param tiempoLlegada tiempoActual - tiempollegada = tiempoRespuesta
      * @return tiempoRespuesta
      */
     @Override
