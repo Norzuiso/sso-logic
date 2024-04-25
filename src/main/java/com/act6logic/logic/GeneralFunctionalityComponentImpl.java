@@ -42,7 +42,7 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
     @Override
     public ProcessResult resolveProcess(ProcessResult pr) {
-        if (pr.getState().isEmpty()|| pr.getState().equals("undefined")){
+        if (pr.getState().isEmpty() || pr.getState().equals("undefined")) {
             pr.setState("C");
         }
         if (pr.getProcesosEspera().isEmpty()
@@ -55,21 +55,6 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         ) && pr.getProcesosBloqueados().getProcesosBloqueados().isEmpty()) {
             return pr;
         }
-        boolean isStatePorB = Objects.equals(pr.getState(), "P") || Objects.equals(pr.getState(), "B");
-        if (isStatePorB) {
-            previousState = pr.getState();
-            return pr;
-        }
-        boolean isPreviousStatePorB = previousState.equals("P") || previousState.equals("B");
-        boolean isPrState = pr.getState().equals("C");
-        if (isPreviousStatePorB && isPrState) {
-            previousState = "C";
-            pr.setState("C");
-        } else if (!isPrState) {
-            pr.setState(previousState);
-            return pr;
-        }
-
 
         String state = pr.getState();
 
@@ -94,24 +79,70 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         //Proceso terminado
         List<Proceso> procesoTerminado = pr.getProcesoTerminado();
 
-        if (pr.getState().equals("N")){
-            state = "C";
-            String lastId = procesosNuevos.getLast().getId();
-            Proceso newProceso = generateProcessComponent.generateProceso(lastId);
-            procesosNuevos.addLast(newProceso);
+        switch (state) {
+            case "P":
+                if (previousState.equals("P")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                previousState = "P";
+                pr.setState(previousState);
+                return pr;
+            case "B":
+                if (previousState.equals("B")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                previousState = "B";
+                pr.setState(previousState);
+                return pr;
+            case "C":
+                if (previousState.equals("P") || previousState.equals("B")) {
+                    previousState = "C";
+                    break;
+                }
+                break;
+            case "W":
+                if (previousState.equals("P") || previousState.equals("B")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                state = "C";
+                previousState = "C";
+                procesoEjecucionService.finisProcessError(procesoEnEjecucion, tiempoActual, "Error");
+                procesoTerminado.addFirst(procesoEnEjecucion);
+                processInMemory--;
+                procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
+                break;
+            case "E":
+                if (previousState.equals("P") || previousState.equals("B")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                state = "C";
+                previousState = "C";
+                procesosBloqueadosList.addLast(procesoEnEjecucion);
+                procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
+                break;
+            case "N":
+                if (previousState.equals("P") || previousState.equals("B")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                state = "C";
+                previousState = "C";
+                String lastId = procesosNuevos.getLast().getId();
+                Proceso newProceso = generateProcessComponent.generateProceso(lastId);
+                procesosNuevos.addLast(newProceso);
+                break;
+            default:
+                if (previousState.equals("P") || previousState.equals("B")) {
+                    pr.setState(previousState);
+                    return pr;
+                }
+                break;
         }
-        if (Objects.equals(pr.getState(), "E")) {
-            state = "C";
-            procesosBloqueadosList.addLast(procesoEnEjecucion);
-            procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
-        }
-        if (Objects.equals(pr.getState(), "W")) {
-            state = "C";
-            procesoEjecucionService.finisProcessError(procesoEnEjecucion, tiempoActual, "Error");
-            procesoTerminado.addFirst(procesoEnEjecucion);
-            processInMemory--;
-            procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
-        }
+
 
         // Procesado de bloqueados
         proBloqueadoService.updateProcesosBloqueados(procesosBloqueadosList, procesosEspera);
@@ -168,7 +199,8 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         return procesoEnEjecucion;
     }
 
-    private static ProcessResult generateResult(String state, Integer contadorGlobal, Integer processInMemory, List<Proceso> procesosNuevos, List<Proceso> procesosEspera, ProcesosBloqueados procesosBloqueados, Proceso procesoEnEjecucion, List<Proceso> procesoTerminado) {
+    private static ProcessResult generateResult(String state, Integer contadorGlobal, Integer processInMemory,
+                                                List<Proceso> procesosNuevos, List<Proceso> procesosEspera, ProcesosBloqueados procesosBloqueados, Proceso procesoEnEjecucion, List<Proceso> procesoTerminado) {
         return new ProcessResult(
                 state,
                 contadorGlobal,

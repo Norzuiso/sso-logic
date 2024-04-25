@@ -58,7 +58,8 @@ public class GeneralController {
     @PostMapping("/result/{state}")
     public ProcessResult resolveProcessWithState(@PathVariable String state,@RequestBody ProcessResult processResult) throws InterruptedException {
         processResult.setState(state);
-        return generalFuncionality.resolveProcess(processResult);
+        ProcessResult processResult1 = generalFuncionality.resolveProcess(processResult);
+       return processResult1;
     }
 
 }
