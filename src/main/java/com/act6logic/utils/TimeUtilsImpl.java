@@ -15,7 +15,6 @@ public class TimeUtilsImpl implements TimeUtils {
     }
 
 
-
     @Override
     public ProcessTime decrement(ProcessTime pt) {
         return resTime(pt, processTimeOneSecond);
@@ -32,8 +31,9 @@ public class TimeUtilsImpl implements TimeUtils {
     @Override
     public ProcessTime resTime(ProcessTime pt1, ProcessTime pt2) {
         ProcessTime result = new ProcessTime(0, 0);
-        result.setMinutes(pt1.getMinutes() - pt2.getMinutes());
-        result.setSeconds(pt1.getSeconds() - pt2.getSeconds());
+        Integer secondsFromMinutes = (pt1.getMinutes() * 60) - pt2.getMinutes() * 60;
+        secondsFromMinutes += (pt1.getSeconds()) - (pt2.getSeconds());
+        result.setSeconds(secondsFromMinutes);
         return processSeconds(result);
     }
 

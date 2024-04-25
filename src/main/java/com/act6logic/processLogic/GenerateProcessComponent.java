@@ -10,4 +10,6 @@ public interface GenerateProcessComponent {
 
 
     Proceso generateProceso(String lastId);
+
+    Proceso generateProceso(int lastValue);
 }

@@ -72,7 +72,11 @@ public class GeneralController {
 
         processResult.setProcesosEspera(procesosEspera);
 
-        processResult.setProcessInMemory(4);
+        if (processQuantity < 4) {
+            processResult.setProcessInMemory(processQuantity);
+        } else {
+            processResult.setProcessInMemory(4);
+        }
 
         processResult.setProcesosNuevos(procesoList);
         processResult.setQuantum(quantum);
@@ -86,7 +90,7 @@ public class GeneralController {
 
     // A partir de la act-8 se usa este, act-10 tambien manda el estado
     @PostMapping("/result/{state}")
-    public ProcessResult resolveProcessWithState(@PathVariable String state,@RequestBody ProcessResult processResult) throws InterruptedException {
+    public ProcessResult resolveProcessWithState(@PathVariable String state, @RequestBody ProcessResult processResult) throws InterruptedException {
         processResult.setState(state);
         return generalFuncionality.resolveProcess(processResult);
     }
