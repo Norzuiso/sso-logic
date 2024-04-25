@@ -20,4 +20,6 @@ public class ProcessResult {
     private ProcesosBloqueados procesosBloqueados = new ProcesosBloqueados();
     private Proceso procesoEnEjecucion = new Proceso();
     private List<Proceso> procesoTerminado = new ArrayList<>();
+    private ProcessTime quantumInProgress = new ProcessTime();
+    private Integer quantum;
 }

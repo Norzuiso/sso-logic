@@ -77,6 +77,10 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         //Actualizamos tiempo
         contadorGlobal++;
 
+        ProcessTime quantumInProgress = pr.getQuantumInProgress();
+        quantumInProgress = timeUtils.increment(quantumInProgress);
+        Integer quantum = pr.getQuantum();
+
         ProcessTime tiempoActual = timeUtils.processSeconds(contadorGlobal);
 
         Integer processInMemory = pr.getProcessInMemory();
@@ -93,6 +97,7 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
         //Proceso terminado
         List<Proceso> procesoTerminado = pr.getProcesoTerminado();
+
 
         if (pr.getState().equals("N")){
             state = "C";
@@ -127,11 +132,17 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
         // Proceso en ejecucion
         if (procesoEjecucionService.isInvalid(procesoEnEjecucion)) {
-            return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera, procesosBloqueados, procesoEnEjecucion, procesoTerminado);
+            return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera,
+                    procesosBloqueados, procesoEnEjecucion, procesoTerminado, quantumInProgress, quantum);
         }
 
         procesoEjecucionService.updateProcesoEnEjecucion(procesoEnEjecucion);
 
+        if (quantumInProgress.getSeconds() == quantum){
+            quantumInProgress = new ProcessTime();
+            procesosEspera.addLast(procesoEnEjecucion);
+            procesoEnEjecucion = procesosEspera.removeFirst();
+        }
 
         boolean isProcessReady = procesoEjecucionService.isProcessDone(procesoEnEjecucion);
         if (isProcessReady) {
@@ -144,7 +155,8 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
         procesosBloqueados = new ProcesosBloqueados(procesosBloqueadosList, procesosBloqueados.getTenemosBloqueados());
         if (procesosNuevos.isEmpty()) {
-            return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera, procesosBloqueados, procesoEnEjecucion, procesoTerminado);
+            return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera,
+                    procesosBloqueados, procesoEnEjecucion, procesoTerminado, quantumInProgress, quantum);
         }
         if ((processInMemory < 4) && !procesosNuevos.isEmpty()) {
             Proceso proceso = procesosNuevos.removeFirst();
@@ -154,7 +166,8 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         }
 
 
-        return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera, procesosBloqueados, procesoEnEjecucion, procesoTerminado);
+        return generateResult(state, contadorGlobal, processInMemory, procesosNuevos, procesosEspera,
+                procesosBloqueados, procesoEnEjecucion, procesoTerminado, quantumInProgress, quantum);
     }
 
     private Proceso getProcesoNewProcesoEjecucion(List<Proceso> procesosEspera, ProcessTime tiempoActual) {
@@ -168,7 +181,7 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         return procesoEnEjecucion;
     }
 
-    private static ProcessResult generateResult(String state, Integer contadorGlobal, Integer processInMemory, List<Proceso> procesosNuevos, List<Proceso> procesosEspera, ProcesosBloqueados procesosBloqueados, Proceso procesoEnEjecucion, List<Proceso> procesoTerminado) {
+    private static ProcessResult generateResult(String state, Integer contadorGlobal, Integer processInMemory, List<Proceso> procesosNuevos, List<Proceso> procesosEspera, ProcesosBloqueados procesosBloqueados, Proceso procesoEnEjecucion, List<Proceso> procesoTerminado, ProcessTime quantumInProgress, Integer quantum) {
         return new ProcessResult(
                 state,
                 contadorGlobal,
@@ -177,8 +190,10 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 procesosEspera,
                 procesosBloqueados,
                 procesoEnEjecucion,
-                procesoTerminado
-        );
+                procesoTerminado,
+                quantumInProgress,
+                quantum
+                );
     }
 
     private void procesosFill(List<Proceso> procesosNuevos,

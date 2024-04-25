@@ -50,11 +50,41 @@ public class GeneralController {
         return processResult;
     }
 
+
+    @GetMapping("/generateProcess/{processQuantity}/{quantum}")
+    public ProcessResult generateProcess(@PathVariable Integer processQuantity, @PathVariable Integer quantum) {
+        processQuantity--;
+        ProcessResult processResult = new ProcessResult();
+        List<Proceso> procesoList = generateProcess.generateProcesos(processQuantity);
+        int processInMemory = 1;
+        processResult.setProcesoEnEjecucion(procesoList.removeFirst());
+        List<Proceso> procesosEspera = new ArrayList<>();
+
+        for (; processInMemory <= 3; processInMemory++) {
+            if (procesoList.isEmpty()) {
+                break;
+            }
+            Proceso removeFirst = procesoList.removeFirst();
+            removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
+            removeFirst.setLlegada(true);
+            procesosEspera.add(removeFirst);
+        }
+
+        processResult.setProcesosEspera(procesosEspera);
+
+        processResult.setProcessInMemory(4);
+
+        processResult.setProcesosNuevos(procesoList);
+        processResult.setQuantum(quantum);
+        return processResult;
+    }
+
     @PostMapping("/result")
     public ProcessResult resolveProcess(@RequestBody ProcessResult processResult) throws InterruptedException {
         return generalFuncionality.resolveProcess(processResult);
     }
 
+    // A partir de la act-8 se usa este, act-10 tambien manda el estado
     @PostMapping("/result/{state}")
     public ProcessResult resolveProcessWithState(@PathVariable String state,@RequestBody ProcessResult processResult) throws InterruptedException {
         processResult.setState(state);
