@@ -24,4 +24,6 @@ public interface ProcessTimeUtils {
     void calculateTiemposLlegada(Proceso proceso, ProcessTime tiempoActual);
 
     void calculateTiempoRespuesta(Proceso proceso, ProcessTime tiempoActual);
+
+    void updateTiempoServicio(Proceso procesoEnEjecucion);
 }

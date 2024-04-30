@@ -24,12 +24,19 @@ public class ProcesoEjecucionServiceImpl implements ProcesoEjecucionService {
     private void updateTiempos(Proceso procesoEnEjecucion) {
         processTimeUtils.updateTiempoPorEjecutar(procesoEnEjecucion);
         processTimeUtils.updateTiempoTranscurrido(procesoEnEjecucion);
+        processTimeUtils.updateTiempoRetorno(procesoEnEjecucion);
+        processTimeUtils.updateTiempoServicio(procesoEnEjecucion);
 
     }
 
     @Override
     public boolean isInvalid(Proceso procesoEnEjecucion) {
         return (procesoEnEjecucion.getId().isEmpty());
+    }
+
+    @Override
+    public boolean isValid(Proceso procesoEnEjecucion) {
+        return !(procesoEnEjecucion.getId().isEmpty());
     }
 
     @Override

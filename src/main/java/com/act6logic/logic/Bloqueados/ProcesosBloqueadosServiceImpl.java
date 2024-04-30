@@ -50,6 +50,8 @@ public class ProcesosBloqueadosServiceImpl implements ProcesosBloqueadosService 
             processTimeUtils.updateTiempoBloqueado(proceso);
 
             processTimeUtils.updateTiempoBloqueadoParaSalir(proceso);
+            processTimeUtils.updateTiempoRetorno(proceso);
+
 
         }
     }

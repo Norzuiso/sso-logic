@@ -29,7 +29,9 @@ public class GeneralController {
         ProcessResult processResult = new ProcessResult();
         List<Proceso> procesoList = generateProcess.generateProcesos(processQuantity);
         int processInMemory = 1;
-        processResult.setProcesoEnEjecucion(procesoList.removeFirst());
+        Proceso procesoEnEjecucion = procesoList.removeFirst();
+        procesoEnEjecucion.setRespuesta(true);
+        processResult.setProcesoEnEjecucion(procesoEnEjecucion);
         List<Proceso> procesosEspera = new ArrayList<>();
 
         for (; processInMemory <= 3; processInMemory++) {
@@ -38,7 +40,9 @@ public class GeneralController {
             }
             Proceso removeFirst = procesoList.removeFirst();
             removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
+            removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
             removeFirst.setLlegada(true);
+
             procesosEspera.add(removeFirst);
         }
 
@@ -57,7 +61,14 @@ public class GeneralController {
         ProcessResult processResult = new ProcessResult();
         List<Proceso> procesoList = generateProcess.generateProcesos(processQuantity);
         int processInMemory = 1;
-        processResult.setProcesoEnEjecucion(procesoList.removeFirst());
+        Proceso procesoEnEjecucion = procesoList.removeFirst();
+
+        procesoEnEjecucion.setTiempoLlegada(new ProcessTime());
+        procesoEnEjecucion.setLlegada(true);
+        procesoEnEjecucion.setTiempoRespuesta(new ProcessTime());
+        procesoEnEjecucion.setRespuesta(true);
+
+        processResult.setProcesoEnEjecucion(procesoEnEjecucion);
         List<Proceso> procesosEspera = new ArrayList<>();
 
         for (; processInMemory <= 3; processInMemory++) {
@@ -67,6 +78,7 @@ public class GeneralController {
             Proceso removeFirst = procesoList.removeFirst();
             removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
             removeFirst.setLlegada(true);
+
             procesosEspera.add(removeFirst);
         }
 
