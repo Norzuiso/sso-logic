@@ -44,7 +44,11 @@ public class GeneralController {
 
         processResult.setProcesosEspera(procesosEspera);
 
-        processResult.setProcessInMemory(4);
+        if (processQuantity < 4) {
+            processResult.setProcessInMemory(processQuantity);
+        } else {
+            processResult.setProcessInMemory(4);
+        }
 
         processResult.setProcesosNuevos(procesoList);
         return processResult;
