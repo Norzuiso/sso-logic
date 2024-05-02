@@ -42,6 +42,7 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
     private String previousState = "C";
 
+
     @Override
     public ProcessResult resolveProcess(ProcessResult pr) {
         if (pr.getState().isEmpty() || pr.getState().equals("undefined")) {
@@ -166,6 +167,9 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 break;
         }
 
+        // Procesado de espera
+        procesosEsperaService.updateProcesosEspera(procesosEspera);
+
 
         // Procesado de bloqueados
         proBloqueadoService.updateProcesosBloqueados(procesosBloqueadosList, procesosEspera);
@@ -174,9 +178,6 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
             procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
         }
         procesosBloqueados = new ProcesosBloqueados(procesosBloqueadosList, procesosBloqueados.getTenemosBloqueados());
-
-        // Procesado de espera
-        procesosEsperaService.updateProcesosEspera(procesosEspera);
 
 
         // Proceso en ejecucion
@@ -242,7 +243,7 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
     }
 
     private void setValuesForFirstTimeInEjecucion(ProcessTime tiempoActual, Proceso procesoEnEjecucion) {
-        if (!procesoEnEjecucion.getRespuesta()){
+        if (!procesoEnEjecucion.getRespuesta()) {
             procesoEnEjecucion.setTiempoRespuesta(tiempoActual);
             procesoEnEjecucion.setRespuesta(true);
         }

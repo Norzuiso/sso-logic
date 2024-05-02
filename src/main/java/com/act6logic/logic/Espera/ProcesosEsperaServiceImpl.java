@@ -26,8 +26,6 @@ public class ProcesosEsperaServiceImpl implements ProcesosEsperaService {
         }
         for (Proceso proceso : procesosEspera) {
             processTimeUtils.updateTiempoEspera(proceso);
-            processTimeUtils.updateTiempoRetorno(proceso);
-
         }
 
     }
