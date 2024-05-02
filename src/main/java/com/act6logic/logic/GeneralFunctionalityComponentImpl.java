@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityComponent {
@@ -68,7 +67,6 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
         ProcessTime tiempoActual = timeUtils.processSeconds(contadorGlobal);
 
-        Integer processInMemory = pr.getProcessInMemory();
 
         List<Proceso> procesosNuevos = pr.getProcesosNuevos();
         List<Proceso> procesosEspera = pr.getProcesosEspera();
@@ -82,6 +80,8 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
 
         //Proceso terminado
         List<Proceso> procesoTerminado = pr.getProcesoTerminado();
+
+        Integer processInMemory = getProcessInMemory(procesosEspera, procesosBloqueadosList, procesoEnEjecucion);
 
         switch (state) {
             case "P":
@@ -140,13 +140,16 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 if (procesosNuevos.isEmpty()) {
                     Integer randomInteger = utils.getRandomInteger(procesoTerminado.size(), 10000);
                     newProceso = generateProcessComponent.generateProceso(randomInteger);
+                    newProceso.setTiempoRespuesta(tiempoActual);
+                    newProceso.setTiempoLlegada(tiempoActual);
+
                 } else {
                     String lastId = procesosNuevos.getLast().getId();
                     newProceso = generateProcessComponent.generateProceso(lastId);
                 }
                 procesosNuevos.addLast(newProceso);
                 if (procesosEspera.isEmpty()) {
-                    if (processInMemory==0){
+                    if (processInMemory == 0) {
                         processInMemory++;
                     }
                     processInMemory = fillProcessEspera(processInMemory, procesosNuevos, tiempoActual, procesosEspera);
@@ -160,6 +163,9 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 break;
         }
 
+        // Procesado de espera
+        procesosEsperaService.updateProcesosEspera(procesosEspera);
+
 
         // Procesado de bloqueados
         proBloqueadoService.updateProcesosBloqueados(procesosBloqueadosList, procesosEspera);
@@ -168,9 +174,6 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
             procesoEnEjecucion = getProcesoNewProcesoEjecucion(procesosEspera, tiempoActual);
         }
         procesosBloqueados = new ProcesosBloqueados(procesosBloqueadosList, procesosBloqueados.getTenemosBloqueados());
-
-        // Procesado de espera
-        procesosEsperaService.updateProcesosEspera(procesosEspera);
 
 
         // Proceso en ejecucion
@@ -201,6 +204,10 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 procesosBloqueados, procesoEnEjecucion, procesoTerminado);
     }
 
+    private int getProcessInMemory(List<Proceso> procesosEspera, List<Proceso> procesosBloqueadosList, Proceso procesoEnEjecucion) {
+        return procesosEspera.size() + procesosBloqueadosList.size() + (procesoEjecucionService.isValid(procesoEnEjecucion) ? 1 : 0);
+    }
+
     private Integer fillProcessEspera(Integer processInMemory, List<Proceso> procesosNuevos, ProcessTime tiempoActual, List<Proceso> procesosEspera) {
         if ((processInMemory < 4) && !procesosNuevos.isEmpty()) {
             Proceso proceso = procesosNuevos.removeFirst();
@@ -215,12 +222,20 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
         Proceso procesoEnEjecucion;
         if (!procesosEspera.isEmpty()) {
             procesoEnEjecucion = procesosEspera.removeFirst();
-            procesoTimeUtils.calculateTiempoRespuesta(procesoEnEjecucion, tiempoActual);
+            setValuesForFirstTimeInEjecucion(tiempoActual, procesoEnEjecucion);
         } else {
             procesoEnEjecucion = new Proceso();
         }
         return procesoEnEjecucion;
     }
+
+    private void setValuesForFirstTimeInEjecucion(ProcessTime tiempoActual, Proceso procesoEnEjecucion) {
+        if (!procesoEnEjecucion.getRespuesta()) {
+            procesoEnEjecucion.setTiempoRespuesta(tiempoActual);
+            procesoEnEjecucion.setRespuesta(true);
+        }
+    }
+
 
     private static ProcessResult generateResult(String state, Integer contadorGlobal, Integer processInMemory,
                                                 List<Proceso> procesosNuevos, List<Proceso> procesosEspera, ProcesosBloqueados procesosBloqueados, Proceso procesoEnEjecucion, List<Proceso> procesoTerminado) {
@@ -235,20 +250,5 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 procesoTerminado
         );
     }
-
-    private void procesosFill(List<Proceso> procesosNuevos,
-                              ProcesosBloqueados procesosBloqueados,
-                              List<Proceso> procesosEspera, Integer processInMemory, Integer contadorGlobal) {
-        if (processInMemory < 4) {
-            if (!procesosNuevos.isEmpty()) {
-                Proceso removeFirst = procesosNuevos.removeFirst();
-                removeFirst.setTiempoLlegada(timeUtils.processSeconds(contadorGlobal));
-                removeFirst.setLlegada(true);
-                procesosEspera.add(removeFirst);
-            }
-        }
-
-    }
-
 
 }

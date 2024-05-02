@@ -12,6 +12,7 @@ public class Proceso {
     private String Operation = "";
     private String Result = "";
     private Boolean Llegada = false;
+    private Boolean Respuesta = false;
     private ProcessTime TiempoMaxEstimado = new ProcessTime();
     private ProcessTime TiempoTranscurrido = new ProcessTime();
     private ProcessTime TiempoLlegada = new ProcessTime();

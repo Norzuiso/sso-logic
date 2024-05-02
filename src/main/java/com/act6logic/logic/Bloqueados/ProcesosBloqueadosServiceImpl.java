@@ -26,6 +26,7 @@ public class ProcesosBloqueadosServiceImpl implements ProcesosBloqueadosService 
             extraerProcesosBloqueados(procesosBloqueadosList, procesosEspera, bloqueqadosPorSalir);
         }
     }
+
     @Override
     public void extraerProcesosBloqueados(List<Proceso> procesosBloqueadosList,
                                           List<Proceso> procesosEspera,
@@ -46,11 +47,8 @@ public class ProcesosBloqueadosServiceImpl implements ProcesosBloqueadosService 
 
     private void updateTiemposBloqueado(List<Proceso> procesosBloqueadosList) {
         for (Proceso proceso : procesosBloqueadosList) {
-
             processTimeUtils.updateTiempoBloqueado(proceso);
-
             processTimeUtils.updateTiempoBloqueadoParaSalir(proceso);
-
         }
     }
 

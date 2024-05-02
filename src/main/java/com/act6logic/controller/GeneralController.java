@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Thread.sleep;
 
 @RestController
 @RequestMapping("")
@@ -29,7 +28,46 @@ public class GeneralController {
         ProcessResult processResult = new ProcessResult();
         List<Proceso> procesoList = generateProcess.generateProcesos(processQuantity);
         int processInMemory = 1;
-        processResult.setProcesoEnEjecucion(procesoList.removeFirst());
+        Proceso procesoEnEjecucion = procesoList.removeFirst();
+        procesoEnEjecucion.setRespuesta(true);
+        processResult.setProcesoEnEjecucion(procesoEnEjecucion);
+        List<Proceso> procesosEspera = new ArrayList<>();
+
+        for (; processInMemory <= 3; processInMemory++) {
+            if (procesoList.isEmpty()) {
+                break;
+            }
+            Proceso removeFirst = procesoList.removeFirst();
+            removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
+            removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
+            removeFirst.setLlegada(true);
+
+            procesosEspera.add(removeFirst);
+        }
+
+        processResult.setProcesosEspera(procesosEspera);
+
+        processResult.setProcessInMemory(4);
+
+        processResult.setProcesosNuevos(procesoList);
+        return processResult;
+    }
+
+
+    @GetMapping("/generateProcess/{processQuantity}/{quantum}")
+    public ProcessResult generateProcess(@PathVariable Integer processQuantity, @PathVariable Integer quantum) {
+        processQuantity--;
+        ProcessResult processResult = new ProcessResult();
+        List<Proceso> procesoList = generateProcess.generateProcesos(processQuantity);
+        int processInMemory = 1;
+        Proceso procesoEnEjecucion = procesoList.removeFirst();
+
+        procesoEnEjecucion.setTiempoLlegada(new ProcessTime());
+        procesoEnEjecucion.setLlegada(true);
+        procesoEnEjecucion.setTiempoRespuesta(new ProcessTime());
+        procesoEnEjecucion.setRespuesta(true);
+
+        processResult.setProcesoEnEjecucion(procesoEnEjecucion);
         List<Proceso> procesosEspera = new ArrayList<>();
 
         for (; processInMemory <= 3; processInMemory++) {
@@ -39,6 +77,7 @@ public class GeneralController {
             Proceso removeFirst = procesoList.removeFirst();
             removeFirst.setTiempoLlegada(new ProcessTime(0, 0));
             removeFirst.setLlegada(true);
+
             procesosEspera.add(removeFirst);
         }
 
@@ -59,11 +98,11 @@ public class GeneralController {
         return generalFuncionality.resolveProcess(processResult);
     }
 
+    // A partir de la act-8 se usa este, act-10 tambien manda el estado
     @PostMapping("/result/{state}")
-    public ProcessResult resolveProcessWithState(@PathVariable String state,@RequestBody ProcessResult processResult) throws InterruptedException {
+    public ProcessResult resolveProcessWithState(@PathVariable String state, @RequestBody ProcessResult processResult) throws InterruptedException {
         processResult.setState(state);
-        ProcessResult processResult1 = generalFuncionality.resolveProcess(processResult);
-       return processResult1;
+        return generalFuncionality.resolveProcess(processResult);
     }
 
 }

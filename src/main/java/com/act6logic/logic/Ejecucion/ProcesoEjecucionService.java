@@ -7,6 +7,8 @@ public interface ProcesoEjecucionService {
     void updateProcesoEnEjecucion(Proceso procesoEnEjecucion);
 
     boolean isInvalid(Proceso procesoEnEjecucion);
+    boolean isValid(Proceso procesoEnEjecucion);
+
 
     boolean isProcessDone(Proceso procesoEnEjecucion);
 

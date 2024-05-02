@@ -79,7 +79,13 @@ public class ProcessTimeUtilsImpl implements ProcessTimeUtils {
     @Override
     public void calculateTiempoRespuesta(Proceso proceso, ProcessTime tiempoActual) {
         ProcessTime tiempoLlegada = proceso.getTiempoFinalizacion();
-        proceso.setTiempoRespuesta(calculateTiempoRespuesta(tiempoActual, tiempoLlegada));
+        proceso.setTiempoRespuesta(timeUtils.resTime(tiempoActual, tiempoLlegada));
+    }
+
+    @Override
+    public void updateTiempoServicio(Proceso procesoEnEjecucion) {
+        ProcessTime increment = timeUtils.increment(procesoEnEjecucion.getTiempoServicio());
+        procesoEnEjecucion.setTiempoServicio(increment);
     }
 
 }
