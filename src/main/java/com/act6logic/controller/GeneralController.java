@@ -1,6 +1,7 @@
 package com.act6logic.controller;
 
 import com.act6logic.logic.GeneralFunctionalityComponent;
+import com.act6logic.obj.ManejoMemoria;
 import com.act6logic.obj.Proceso;
 import com.act6logic.obj.ProcessResult;
 import com.act6logic.obj.ProcessTime;
@@ -104,6 +105,60 @@ public class GeneralController {
     public ProcessResult resolveProcessWithState(@PathVariable String state, @RequestBody ProcessResult processResult) throws InterruptedException {
         processResult.setState(state);
         return generalFuncionality.resolveProcess(processResult);
+    }
+
+    @GetMapping("/create-memory")
+    public ManejoMemoria createMemory() {
+        ManejoMemoria manejoMemoria = new ManejoMemoria();
+        Proceso proceso = new Proceso();
+        proceso.setId("1-Holaaa");
+        proceso.setMemorySize(26);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        proceso = new Proceso();
+        proceso.setId("2-Holaaa");
+        proceso.setMemorySize(25);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        proceso = new Proceso();
+        proceso.setId("3-Holaaa");
+        proceso.setMemorySize(26);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        proceso = new Proceso();
+        proceso.setId("4-Holaaa");
+        proceso.setMemorySize(25);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        Proceso proceso5 = new Proceso();
+        proceso5.setId("5-Holaaa");
+        proceso5.setMemorySize(26);
+        manejoMemoria.addNewProcessToMemory(proceso5);
+
+        proceso = new Proceso();
+        proceso.setId("6-Holaaa");
+        proceso.setMemorySize(25);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        proceso = new Proceso();
+        proceso.setId("7-Holaaa");
+        proceso.setMemorySize(26);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        manejoMemoria.removeProcessToMemory(proceso5);
+
+        proceso = new Proceso();
+        proceso.setId("8-Holaaa");
+        proceso.setMemorySize(25);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+        proceso = new Proceso();
+        proceso.setId("9-Holaaa");
+        proceso.setMemorySize(10);
+        manejoMemoria.addNewProcessToMemory(proceso);
+
+
+        return manejoMemoria;
     }
 
 }

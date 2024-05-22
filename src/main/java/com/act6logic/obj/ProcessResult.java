@@ -22,4 +22,5 @@ public class ProcessResult {
     private List<Proceso> procesoTerminado = new ArrayList<>();
     private ProcessTime quantumInProgress = new ProcessTime();
     private Integer quantum;
+    private ManejoMemoria manejoMemoria = new ManejoMemoria();
 }

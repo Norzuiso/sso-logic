@@ -3,10 +3,7 @@ package com.act6logic.logic;
 import com.act6logic.logic.Bloqueados.ProcesosBloqueadosService;
 import com.act6logic.logic.Ejecucion.ProcesoEjecucionService;
 import com.act6logic.logic.Espera.ProcesosEsperaService;
-import com.act6logic.obj.Proceso;
-import com.act6logic.obj.ProcesosBloqueados;
-import com.act6logic.obj.ProcessResult;
-import com.act6logic.obj.ProcessTime;
+import com.act6logic.obj.*;
 import com.act6logic.processLogic.GenerateProcessComponent;
 import com.act6logic.utils.ProcessTimeUtils;
 import com.act6logic.utils.TimeUtils;
@@ -260,7 +257,8 @@ public class GeneralFunctionalityComponentImpl implements GeneralFunctionalityCo
                 procesoEnEjecucion,
                 procesoTerminado,
                 quantumInProgress,
-                quantum
+                quantum,
+                new ManejoMemoria()
         );
     }
 

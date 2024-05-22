@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +26,6 @@ public class Proceso {
     private ProcessTime TiempoBloqueadoParaSalir = new ProcessTime();
     private ProcessTime TiempoServicio = new ProcessTime();
     private ProcessTime TiempoRestantePorEjecutar = new ProcessTime();
+    private Integer memorySize = 0;
+
 }
